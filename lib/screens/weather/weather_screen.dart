@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 import 'constants.dart';
 import 'cubit/weather_cubit.dart';
 
+
+
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
 
@@ -22,18 +24,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
   TextEditingController textController = TextEditingController(text: "");
 
   @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
-    BlocProvider.of<WeatherCubit>(context)
-        .loadWeather(isCurrentCity: true, cityName: "");
+    context.read<WeatherCubit>().loadWeather(isCurrentCity: true, cityName: "");
   }
 
   @override
   Widget build(BuildContext context) {
-    String cityName = "Katowice"; //city name
-    int currTemp = 30; // current temperature
-    int maxTemp = 30; // today max temperature
-    int minTemp = 2; // today min temperature
     Size size = MediaQuery.of(context).size;
     var brightness = MediaQuery.of(context).platformBrightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -64,6 +67,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
                       }
                       else if(state is WeatherLoaded){
+                        String cityName = state.weather.city!.name!;
+                        int currTemp = state.weather.list?.first!.main!.temp!.round() ?? 0;
+                        int maxTemp = state.weather.list?.first!.main!.tempMax!.round() ?? 0;
+                        int minTemp = state.weather.list?.first!.main!.tempMin!.round() ?? 0;
                         var dailyForecasts = getDailyForecasts(state.weather.list!);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,17 +93,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                       size: 26,
                                     ),
                                     onSuffixTap: () async {
-                                      if(textController.text.isEmpty){
-                                        log("No city entered");
-                                      }
-                                      else{
-                                        BlocProvider.of<WeatherCubit>(context)
-                                            .loadWeather(isCurrentCity: true, cityName: textController.text);
-                                      }
                                       FocusScope.of(context).unfocus();
                                       textController.clear();
                                     },
-                                    style: f14RblackLetterSpacing2, onSubmitted: (String ) {  },
+                                    style: f14RblackLetterSpacing2,
+                                    onSubmitted: (String value ) {
+                                    if(value.isEmpty){
+                                      print('No city entered');
+
+                                    }
+                                    else{
+                                      print('sam_textController ${textController.text}');
+                                      context.read<WeatherCubit>().loadWeather(isCurrentCity: false, cityName: value);
+                                    }
+
+                                  },
                                   ),
 
                                 ],
@@ -109,7 +120,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                               ),
                               child: Align(
                                 child: Text(
-                                  state.weather.city!.name!,
+                                  cityName,
                                   style: GoogleFonts.questrial(
                                     color: isDarkMode ? Colors.white : Colors.black,
                                     fontSize: size.height * 0.06,
@@ -139,7 +150,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                               ),
                               child: Align(
                                 child: Text(
-                                  '${state.weather.list?.first!.main!.temp!.round()}˚C', //curent temperature
+                                  '$currTemp˚C', //curent temperature
                                   style: GoogleFonts.questrial(
                                     color: currTemp <= 0
                                         ? Colors.blue
@@ -184,7 +195,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '${state.weather.list?.first!.main!.tempMin!.round()}˚C', // min temperature
+                                    '$minTemp˚C', // min temperature
                                     style: GoogleFonts.questrial(
                                       color: minTemp <= 0
                                           ? Colors.blue
@@ -206,7 +217,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '${state.weather.list?.first!.main!.tempMax!.round()}˚C', //max temperature
+                                    '$maxTemp˚C', //max temperature
                                     style: GoogleFonts.questrial(
                                       color: maxTemp <= 0
                                           ? Colors.blue
