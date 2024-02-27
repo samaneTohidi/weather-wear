@@ -6,13 +6,13 @@ import 'dart:developer';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import "package:http/http.dart" as http;
-import 'package:weather_wear/models/test_model.dart';
+import 'package:weather_wear/models/weather_model.dart';
 
 import 'api_key.dart';
 
 class CallToApi {
 
-  Future<TestModel> callWeatherAPi(bool current, String cityName) async {
+  Future<WeatherModel> callWeatherAPi(bool current, String cityName) async {
     try {
       Position currentPosition = await getCurrentPosition();
 
@@ -24,7 +24,7 @@ class CallToApi {
         cityName = place.locality!;
       }
 
-      var url = Uri.https('api.openweathermap.org' ,'/data/2.5/forecast' , {'q': cityName ,"units": "metric" ,'appid': apiKey});
+      var url = Uri.https('api.openweathermap.org' ,'/data/2.5/forecast' , {'q': cityName ,'units': 'metric' ,'exclude': 'daily', 'appid': apiKey});
 
 
 
@@ -32,7 +32,7 @@ class CallToApi {
       log(response.body.toString());
       if (response.statusCode == 200) {
         final decodedJson = json.decode(response.body);
-        return TestModel.fromJson(decodedJson);
+        return WeatherModel.fromJson(decodedJson);
 
       } else {
         throw Exception('Failed to load weather data');

@@ -68,9 +68,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       }
                       else if(state is WeatherLoaded){
                         String cityName = state.weather.city!.name!;
-                        int currTemp = state.weather.list?.first!.main!.temp!.round() ?? 0;
-                        int maxTemp = state.weather.list?.first!.main!.tempMax!.round() ?? 0;
-                        int minTemp = state.weather.list?.first!.main!.tempMin!.round() ?? 0;
+                        int currTemp = state.weather.list?.first!.main!.temp!.toInt() ?? 0;
+                        int maxTemp = state.weather.list?.first!.main!.tempMax!.toInt() ?? 0;
+                        int minTemp = state.weather.list?.first!.main!.tempMin!.toInt() ?? 0;
                         var dailyForecasts = getDailyForecasts(state.weather.list!);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

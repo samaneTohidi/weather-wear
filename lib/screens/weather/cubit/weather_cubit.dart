@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 
-import '../../../models/test_model.dart';
+import '../../../models/weather_model.dart';
 import '../../../repositories/call_to_api.dart';
 
 part 'weather_state.dart';
