@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/weather_model.dart';
 import '../../../repositories/call_to_api.dart';
@@ -23,8 +24,23 @@ class WeatherCubit extends Cubit<WeatherState> {
     }
   }
 
+  Future<void> checkCharacterSelected() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isCharacterSelected = prefs.getString('character') ?? 'Woman';
+    print("sam_weather2${isCharacterSelected}");
+    try{
+      emit(CharacterSelected(isCharacterSelected));
+
+    }
+    catch(error){
+
+    }
+  }
 
 }
+
+
+
 
 List<ForecastEntry> getDailyForecasts(List<ForecastEntry> forecasts) {
   Map<String, ForecastEntry> dailyForecasts = {};

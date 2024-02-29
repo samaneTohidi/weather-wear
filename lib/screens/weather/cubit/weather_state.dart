@@ -16,3 +16,8 @@ class WeatherError extends WeatherState {
   final String message;
   WeatherError(this.message);
 }
+
+class CharacterSelected extends WeatherState {
+  final String character;
+  CharacterSelected(this.character);
+}
