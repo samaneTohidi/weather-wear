@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_wear/screens/main/nav_screen.dart';
-import 'package:weather_wear/screens/weather/weather_screen.dart';
 import '../../models/character_model.dart';
 import '../../utils/character_list.dart';
 
@@ -85,11 +84,11 @@ class DefineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => NavScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavScreen()));
       },
       child: Text('Define'),
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 50), // double.infinity is the width
+        minimumSize: Size(double.infinity, 50),
       ),
     );
   }
