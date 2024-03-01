@@ -21,3 +21,5 @@ class CharacterSelected extends WeatherState {
   final String character;
   CharacterSelected(this.character);
 }
+
+

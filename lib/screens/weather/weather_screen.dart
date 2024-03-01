@@ -4,10 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/clothing_model.dart';
+import '../../models/weather_conditions_model.dart';
 import 'constants.dart';
 import 'cubit/weather_cubit.dart';
 
@@ -30,7 +31,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<WeatherCubit>().loadWeather(isCurrentCity: true, cityName: "");
+    context.read<WeatherCubit>().loadWeather(
+          isCurrentCity: true,
+          cityName: "",
+        );
     context.read<WeatherCubit>().checkCharacterSelected();
   }
 
@@ -40,6 +44,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
     var brightness = MediaQuery.of(context).platformBrightness;
     bool isDarkMode = brightness == Brightness.dark;
     String? characterName;
+    WeatherConditionsModel? tempDescription;
+
     return Scaffold(
       body: Center(
         child: Container(
@@ -60,18 +66,20 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       }
                     },
                     builder: (context, state) {
+                      if (state is CharacterSelected) {
+                        characterName = state.character;
+                      }
                       if (state is WeatherLoading) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (state is WeatherError) {
                         return const Scaffold();
-                      }
-                      if (state is CharacterSelected) {
-                        characterName = state.character;
-                      }
-                      else if (state is WeatherLoaded) {
+                      } else if (state is WeatherLoaded) {
                         String cityName = state.weather.city!.name!;
                         int currTemp =
                             state.weather.list?.first!.main!.temp!.toInt() ?? 0;
+                        String weatherCondition =
+                            state.weather.list?.first!.weather!.first!.main ??
+                                '';
                         int maxTemp =
                             state.weather.list?.first!.main!.tempMax!.toInt() ??
                                 0;
@@ -83,6 +91,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
                             '';
                         var dailyForecasts =
                             getDailyForecasts(state.weather.list!);
+                        tempDescription = updateWeather(currTemp, weatherCondition);
+                        print('tempDescription${tempDescription!.weatherType}${tempDescription!.weatherCondition}');
+
+                        var recommendedClothes = getClothesRecommendation(tempDescription!.weatherType, tempDescription!.weatherCondition);
+                        print(recommendedClothes.map((c) => c.name).join(', '));
+
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -198,10 +213,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: size.width * 0.13,
-
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '$characterName', // min temperature
@@ -209,14 +224,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                             color: minTemp <= 0
                                                 ? Colors.blue
                                                 : minTemp > 0 && minTemp <= 15
-                                                ? Colors.indigo
-                                                : minTemp > 15 && minTemp < 30
-                                                ? Colors.deepPurple
-                                                : Colors.pink,
+                                                    ? Colors.indigo
+                                                    : minTemp > 15 &&
+                                                            minTemp < 30
+                                                        ? Colors.deepPurple
+                                                        : Colors.pink,
                                             fontSize: size.height * 0.03,
                                           ),
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -238,15 +253,83 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                       child: Column(
                                         children: [
                                           Padding(
-                                            padding:
-                                            EdgeInsets.all(size.width * 0.005),
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Row(
-                                                children: [
-                                                  buildOutfit(minTemp, maxTemp, size, isDarkMode)
-                                                ],
-                                              ),
+                                            padding: EdgeInsets.all(
+                                                size.width * 0.005),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      '${minTemp}˚',
+                                                      // min temperature
+                                                      style:
+                                                          GoogleFonts.questrial(
+                                                        color: minTemp <= 0
+                                                            ? Colors.blue
+                                                            : minTemp > 0 &&
+                                                                    minTemp <=
+                                                                        15
+                                                                ? Colors.indigo
+                                                                : minTemp > 15 &&
+                                                                        minTemp <
+                                                                            30
+                                                                    ? Colors
+                                                                        .deepPurple
+                                                                    : Colors
+                                                                        .pink,
+                                                        fontSize:
+                                                            size.height * 0.03,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '/',
+                                                      style:
+                                                          GoogleFonts.questrial(
+                                                        color: isDarkMode
+                                                            ? Colors.white54
+                                                            : Colors.black54,
+                                                        fontSize:
+                                                            size.height * 0.03,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '$maxTemp˚',
+                                                      //max temperature
+                                                      style:
+                                                          GoogleFonts.questrial(
+                                                        color: maxTemp <= 0
+                                                            ? Colors.blue
+                                                            : maxTemp > 0 &&
+                                                                    maxTemp <=
+                                                                        15
+                                                                ? Colors.indigo
+                                                                : maxTemp > 15 &&
+                                                                        maxTemp <
+                                                                            30
+                                                                    ? Colors
+                                                                        .deepPurple
+                                                                    : Colors
+                                                                        .pink,
+                                                        fontSize:
+                                                            size.height * 0.03,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                ...recommendedClothes.map((clothing) => buildOutfit(clothing.name, clothing.image, size, isDarkMode)).toList(),
+
+                                                // ...List.generate(
+                                                //     clothingList.length,
+                                                //     (index) {
+                                                //   var item = clothingList[index];
+                                                //   var name = item.name;
+                                                //   var icon = item.image;
+                                                //   return buildOutfit(name, icon,
+                                                //       size, isDarkMode);
+                                                // })
+                                              ],
                                             ),
                                           ),
                                         ],
@@ -305,16 +388,26 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                               dailyForecasts.length, (index) {
                                             var forecast =
                                                 dailyForecasts[index];
+                                            for (var forecast
+                                                in dailyForecasts) {
+                                              log('samano${forecast.main!.tempMax!.toString()}');
+                                            }
                                             var day = DateFormat('EEEE').format(
                                                 DateTime.parse(
                                                     forecast.dtTxt!));
+                                            print('jam_day$day');
                                             var minTemp =
                                                 forecast.main!.tempMin!.toInt();
+                                            print('jam_minTemp$minTemp');
+
                                             var maxTemp =
                                                 forecast.main!.tempMax!.toInt();
+                                            print('jam_maxTemp$maxTemp');
+
                                             var weatherIcon = forecast
                                                 .weather!.first.icon
                                                 .toString();
+
                                             return buildSevenDayForecast(
                                                 day,
                                                 minTemp,
@@ -344,10 +437,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
       ),
     );
   }
-
-
-
-
 
   Widget buildSevenDayForecast(String time, int minTemp, int maxTemp,
       String weatherIcon, size, bool isDarkMode) {
@@ -419,57 +508,23 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget buildOutfit(int minTemp, int maxTemp, size, bool isDarkMode) {
-
+  Widget buildOutfit(
+      String apparelName, List<String> apparelIcon, size, bool isDarkMode) {
     return Container(
       decoration: BoxDecoration(color: Colors.grey.shade200.withOpacity(0.5)),
-      child:  Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Text(
-                '${minTemp}˚', // min temperature
-                style: GoogleFonts.questrial(
-                  color: minTemp <= 0
-                      ? Colors.blue
-                      : minTemp > 0 && minTemp <= 15
-                      ? Colors.indigo
-                      : minTemp > 15 && minTemp < 30
-                      ? Colors.deepPurple
-                      : Colors.pink,
-                  fontSize: size.height * 0.03,
-                ),
-              ),
-              Text(
-                '/',
-                style: GoogleFonts.questrial(
-                  color: isDarkMode
-                      ? Colors.white54
-                      : Colors.black54,
-                  fontSize: size.height * 0.03,
-                ),
-              ),
-              Text(
-                '$maxTemp˚', //max temperature
-                style: GoogleFonts.questrial(
-                  color: maxTemp <= 0
-                      ? Colors.blue
-                      : maxTemp > 0 && maxTemp <= 15
-                      ? Colors.indigo
-                      : maxTemp > 15 && maxTemp < 30
-                      ? Colors.deepPurple
-                      : Colors.pink,
-                  fontSize: size.height * 0.03,
-                ),
-              ),
-            ],
-          ),
-
-          Text(clothingList.first.name),
-          Text(clothingList.last.name),
-
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(apparelName),
+                SvgPicture.asset('assets/apparel/${apparelIcon.first}.svg')
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
