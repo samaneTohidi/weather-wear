@@ -22,4 +22,7 @@ class CharacterSelected extends WeatherState {
   CharacterSelected(this.character);
 }
 
+class InternetConnected extends WeatherState {}
 
+
+class InternetDisconnected extends WeatherState {}

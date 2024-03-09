@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/clothing_model.dart';
@@ -10,13 +11,14 @@ import '../../../utils/clothes_recommendations.dart';
 part 'weather_state.dart';
 
 class WeatherCubit extends Cubit<WeatherState> {
-  WeatherCubit() : super(WeatherInitial());
+  WeatherCubit() : super(WeatherInitial()) {
+    _checkInternetConnection();
+  }
 
   Future<void> loadWeather(
       {required bool isCurrentCity, required String cityName}) async {
     try {
       emit(WeatherLoading());
-
       final weather = await CallToApi().callWeatherAPi(isCurrentCity, cityName);
       emit(WeatherLoaded(weather));
     } catch (error) {
@@ -24,11 +26,27 @@ class WeatherCubit extends Cubit<WeatherState> {
     }
   }
 
-  Future<void> checkCharacterSelected() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isCharacterSelected = prefs.getString('character') ?? 'Woman';
-    emit(CharacterSelected(isCharacterSelected));
+
+  Future<void> _checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      emit(InternetDisconnected());
+    } else {
+      emit(InternetConnected());
+
+    }
   }
+
+  Future<void> checkCharacterSelected() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isCharacterSelected = prefs.getString('character') ?? 'Woman';
+      emit(CharacterSelected(isCharacterSelected));
+    } catch (error) {
+      emit(WeatherError(error.toString()));
+    }
+  }
+
 }
 
 WeatherConditionsModel updateWeather(int currTemp, String weatherCondition) {
@@ -39,7 +57,8 @@ WeatherConditionsModel updateWeather(int currTemp, String weatherCondition) {
       weatherCondition: weatherCondition);
 }
 
-List<ClothingModel> getClothesRecommendation(String weatherConditionStr, String weatherTypeStr) {
+List<ClothingModel> getClothesRecommendation(
+    String weatherConditionStr, String weatherTypeStr) {
   WeatherConditions condition = getWeatherCondition(weatherConditionStr);
   WeatherType type = getWeatherType(weatherTypeStr);
 
@@ -88,6 +107,7 @@ String _getTemperatureDescription(int currTemp) {
   if (currTemp <= 40) return "Very Hot";
   return "Extreme heat";
 }
+
 WeatherConditions getWeatherCondition(String description) {
   switch (description.toLowerCase()) {
     case "freezing":

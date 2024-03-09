@@ -4,6 +4,8 @@ import 'package:weather_wear/screens/main/cubit/main_cubit.dart';
 import 'package:weather_wear/screens/main/nav_screen.dart';
 
 import '../avatar/character_screen.dart';
+import '../weather/cubit/weather_cubit.dart';
+import '../weather/weather_screen.dart';
 
 void main() {
   runApp( MyApp());
@@ -33,14 +35,9 @@ class AppView extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: BlocBuilder<MainCubit, MainState>(
-        builder: (context, state) {
-          if (state is CharacterSelected) {
-            return CharacterScreen();
-          } else {
-            return NavScreen();
-          }
-        },
+      home:  BlocProvider(
+        create: (context) => WeatherCubit(),
+        child:  const WeatherScreen(),
       ),
     );
   }
