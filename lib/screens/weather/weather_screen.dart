@@ -27,15 +27,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    context.read<WeatherCubit>().loadWeather(
-          isCurrentCity: true,
-          cityName: "",
-        );
-    context.read<WeatherCubit>().checkCharacterSelected();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +51,27 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   SingleChildScrollView(
                     child: BlocConsumer<WeatherCubit, WeatherState>(
                       listener: (context, state) {
+                        if (state is WeatherError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('An error has occurred, please check the access to the location')));
+                        }
+
                       },
                       builder: (context, state) {
-                        if (state is WeatherLoading) {
+                        if(state is InternetConnected){
+                          context.read<WeatherCubit>().loadWeather(
+                            isCurrentCity: true,
+                            cityName: "",
+                          );
+                        }
+                        else if (state is InternetDisconnected){
+                          return Text("No internet connection. \n Please check your connection" , style: GoogleFonts.questrial(
+                          color: isDarkMode
+                          ? Colors.white54
+                              : Colors.black54,
+                              fontSize: size.height * 0.02));
+                        }
+                        else if (state is WeatherLoading) {
                           return Column(
                             children: [
                               const CircularProgressIndicator(),
@@ -81,11 +91,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           );
                         }
                         else if (state is WeatherError) {
-                          return const Scaffold();
-                        }
-                        else if (state is InternetDisconnected) {
-                          return Text(
-                              "No internet connection. Please check your connection.",
+                          return Text("An error has occurred, please check the access to the location.",
                               style: GoogleFonts.questrial(
                                   color: isDarkMode
                                       ? Colors.white54
@@ -359,8 +365,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         return const SizedBox.shrink();
                       },
                       buildWhen: (previousState, state) {
-                        return state is WeatherLoaded ||
-                            state is WeatherLoading || state is InternetConnected || state is InternetDisconnected;
+                        return state is InternetConnected ||state is InternetDisconnected ||state is WeatherLoaded ||
+                            state is WeatherLoading;
                       },
                     ),
                   ),

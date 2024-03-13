@@ -28,6 +28,7 @@ class WeatherCubit extends Cubit<WeatherState> {
 
 
   Future<void> _checkInternetConnection() async {
+    emit(WeatherLoading());
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       emit(InternetDisconnected());
