@@ -1,14 +1,12 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_wear/screens/weather/widgets/outfit_widget.dart';
+import 'widgets/forecast_widget.dart';
+import 'widgets/weather_search_widget.dart';
 
 import '../../models/weather_conditions_model.dart';
-import 'constants.dart';
 import 'cubit/weather_cubit.dart';
 
 class WeatherScreen extends StatefulWidget {
@@ -26,8 +24,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
     textController.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,34 +128,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: AnimSearchBar(
-                                        rtl: true,
-                                        width: size.width * 0.9,
-                                        textController: textController,
-                                        suffixIcon: const Icon(
-                                          Icons.search,
-                                          color: Colors.black,
-                                          size: 26,
-                                        ),
-                                        onSuffixTap: () async {
-                                          FocusScope.of(context).unfocus();
-                                          textController.clear();
-                                        },
-                                        style: f14RblackLetterSpacing2,
-                                        onSubmitted: (String value) {
-                                          if (value.isEmpty) {
-                                            print('No city entered');
-                                          } else {
-                                            print(
-                                                'sam_textController ${textController.text}');
-                                            context
-                                                .read<WeatherCubit>()
-                                                .loadWeather(
-                                                    isCurrentCity: false,
-                                                    cityName: value);
-                                          }
-                                        },
-                                      ),
+                                      child: WeatherSearchWidget(size: size, textController: textController, onCitySearch: _onCitySearch, onClearSearch: _onClearSearch),
                                     ),
                                   ],
                                 ),
@@ -264,11 +233,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                                 children: [
                                                   ...recommendedClothes
                                                       .map((clothing) =>
-                                                          buildOutfit(
-                                                              clothing.name,
-                                                              clothing.image,
-                                                              size,
-                                                              isDarkMode))
+                                                          OutfitWidget(apparelName: clothing.name, apparelIcon: clothing.image, size: size, isDarkMode: isDarkMode))
                                                       .toList(),
                                                 ],
                                               ),
@@ -344,13 +309,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                                   .weather!.first.icon
                                                   .toString();
 
-                                              return buildSevenDayForecast(
-                                                  day,
-                                                  minTemp,
-                                                  maxTemp,
-                                                  weatherIcon,
-                                                  size,
-                                                  isDarkMode);
+                                              return ForecastWidget(time: day, minTemp: minTemp, maxTemp: maxTemp, weatherIcon: weatherIcon, size: size, isDarkMode: isDarkMode);
                                             }),
                                           ],
                                         ),
@@ -379,106 +338,22 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget buildSevenDayForecast(String time, int minTemp, int maxTemp,
-      String weatherIcon, size, bool isDarkMode) {
-    String iconUrl = 'assets/images/$weatherIcon.png';
 
-    return Padding(
-      padding: EdgeInsets.all(
-        size.height * 0.005,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: size.width * 0.02,
-                ),
-                child: Text(
-                  time,
-                  style: GoogleFonts.questrial(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontSize: size.height * 0.025,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: size.width * 0.32,
-                ),
-                child: Image.asset(iconUrl, height: size.height * 0.03),
-              ),
-              Align(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: size.width * 0.15,
-                  ),
-                  child: Text(
-                    '$minTemp˚C',
-                    style: GoogleFonts.questrial(
-                      color: isDarkMode ? Colors.white38 : Colors.black38,
-                      fontSize: size.height * 0.025,
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: size.width * 0.05,
-                  ),
-                  child: Text(
-                    '$maxTemp˚C',
-                    style: GoogleFonts.questrial(
-                      color: isDarkMode ? Colors.white : Colors.black,
-                      fontSize: size.height * 0.025,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Divider(
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ],
-      ),
-    );
+
+  _onCitySearch(String cityName) {
+    context
+        .read<WeatherCubit>()
+        .loadWeather(
+        isCurrentCity: false,
+        cityName: cityName);
   }
 
-  Widget buildOutfit(
-      String apparelName, List<String> apparelIcon, size, bool isDarkMode) {
-    Random random = Random();
-    int randomIndex = random.nextInt(apparelIcon.length);
-    return Container(
-      decoration: BoxDecoration(color: Colors.grey.shade200.withOpacity(0.4)),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  apparelName,
-                  style: GoogleFonts.questrial(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontSize: size.height * 0.02,
-                  ),
-                ),
-                Image.asset(
-                  'assets/apparel/${apparelIcon[randomIndex]}.png',
-                  width: 24,
-                  height: 24,
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
+  _onClearSearch() {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a city name to search for weather information.'))
     );
   }
 }
+
+
+

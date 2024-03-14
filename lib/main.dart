@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_wear/screens/main/cubit/main_cubit.dart';
 import 'package:weather_wear/screens/main/nav_screen.dart';
 
-import '../avatar/character_screen.dart';
-import '../weather/cubit/weather_cubit.dart';
-import '../weather/weather_screen.dart';
+import 'screens/avatar/character_screen.dart';
+import 'screens/weather/cubit/weather_cubit.dart';
+import 'screens/weather/weather_screen.dart';
 
 void main() {
   runApp( MyApp());
