@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_wear/screens/weather/widgets/outfit_widget.dart';
+import '../main/cubit/main_cubit.dart';
 import 'widgets/forecast_widget.dart';
 import 'widgets/weather_search_widget.dart';
 
@@ -49,7 +51,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       listener: (context, state) {
                         if (state is WeatherError) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('An error has occurred, please check the access to the location')));
+                               SnackBar(content: Text(Localization.of(context).translate('locationError'))));
                         }
 
                       },
@@ -61,7 +63,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           );
                         }
                         else if (state is InternetDisconnected){
-                          return Text("No internet connection. \n Please check your connection" , style: GoogleFonts.questrial(
+                          return Text(Localization.of(context).translate('connectionError') , style: GoogleFonts.questrial(
                           color: isDarkMode
                           ? Colors.white54
                               : Colors.black54,
@@ -75,7 +77,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                 padding:
                                     EdgeInsets.only(top: size.height * 0.06),
                                 child: Text(
-                                  'Loading Weather...',
+                                  Localization.of(context).translate('loadingWeather'),
                                   style: GoogleFonts.questrial(
                                       color: isDarkMode
                                           ? Colors.white54
@@ -87,7 +89,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           );
                         }
                         else if (state is WeatherError) {
-                          return Text("An error has occurred, please check the access to the location.",
+                          return Text(Localization.of(context).translate('locationError'),
                               style: GoogleFonts.questrial(
                                   color: isDarkMode
                                       ? Colors.white54
@@ -117,7 +119,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                               updateWeather(currTemp, weatherCondition);
                           var recommendedClothes = getClothesRecommendation(
                               tempDescription!.weatherType,
-                              tempDescription!.weatherCondition);
+                              tempDescription!.weatherCondition , context);
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -269,7 +271,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                             left: size.width * 0.03,
                                           ),
                                           child: Text(
-                                            '6-day forecast',
+                                            Localization.of(context).translate('forecastSixDays') ,
                                             style: GoogleFonts.questrial(
                                               color: isDarkMode
                                                   ? Colors.white
@@ -350,7 +352,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   _onClearSearch() {
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a city name to search for weather information.'))
+         SnackBar(content: Text(Localization.of(context).translate('cityNamePrompt')))
     );
   }
 }

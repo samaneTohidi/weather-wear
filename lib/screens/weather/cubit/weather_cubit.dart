@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/clothing_model.dart';
@@ -59,12 +60,19 @@ WeatherConditionsModel updateWeather(int currTemp, String weatherCondition) {
 }
 
 List<ClothingModel> getClothesRecommendation(
-    String weatherConditionStr, String weatherTypeStr) {
+    String weatherConditionStr, String weatherTypeStr, BuildContext context) {
   WeatherConditions condition = getWeatherCondition(weatherConditionStr);
   WeatherType type = getWeatherType(weatherTypeStr);
 
-  return clothesRecommendations[condition]?[type] ?? [];
+  ClothingRecommendations recommendations = ClothingRecommendations(context);
+  Map<WeatherConditions, Map<WeatherType, List<ClothingModel>>> clothesMap = recommendations.clothesRecommendations;
+
+  return clothesMap[condition]?[type] ?? [];
 }
+
+
+
+
 
 List<ForecastEntry> getDailyForecasts(List<ForecastEntry> forecasts) {
   Map<String, List<ForecastEntry>> dailyForecastsMap = {};
