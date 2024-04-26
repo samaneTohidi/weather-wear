@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,7 +15,7 @@ class CallToApi {
 
   Future<WeatherModel> callWeatherAPi(bool current, String cityName) async {
     try {
-      Position currentPosition = await getCurrentPosition();
+      Position currentPosition = await getCurrentPosition(); //Checkup
 
       if (current) {
         List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -27,13 +28,11 @@ class CallToApi {
       var url = Uri.https('api.openweathermap.org' ,'/data/2.5/forecast' , {'q': cityName ,'units': 'metric' ,'exclude': 'daily', 'appid': apiKey});
 
 
-
       final http.Response response = await http.get(url);
       log(response.body.toString());
       if (response.statusCode == 200) {
         final decodedJson = json.decode(response.body);
         return WeatherModel.fromJson(decodedJson);
-
       } else {
         throw Exception('Failed to load weather data');
       }
@@ -41,6 +40,23 @@ class CallToApi {
       throw Exception('Failed to load weather data');
     }
   }
+
+
+  // Future<WeatherModel> callApi(Double lat , Double lon, String lang) async{
+  //   const String apiKey='62b4a7c51099a2158b77f99c9591405b';
+  //
+  //    var url = Uri.https('pro.openweathermap.org','/data/2.5/forecast/hourly?', {'lat': lat,'lon':lon, 'lang': lang, 'units': 'metric', 'appid':apiKey});
+  //
+  //    final http.Response response = await http.get(url);
+  //    log(response.body.toString());
+  //    if (response.statusCode == 200) {
+  //      final decodedJson = json.decode(response.body);
+  //      return WeatherModel.fromJson(decodedJson);
+  //
+  //    } else {
+  //      throw Exception('Failed to load weather data');
+  //    }
+  // }
 
 
 
