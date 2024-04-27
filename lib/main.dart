@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:weather_wear/screens/main/cubit/main_cubit.dart';
-import 'package:weather_wear/screens/weather2/responsive_weather_screen.dart';
+import 'package:weather_wear/screens/weather/weather_screen.dart';
 
-import 'screens/weather/cubit/weather_cubit.dart';
-import 'screens/weather/weather_screen.dart';
 
 
 void main() {
@@ -32,7 +28,7 @@ class AppView extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
-        LocalizationDelegate(),
+        // LocalizationDelegate(),
 
       ],
 
@@ -46,7 +42,7 @@ class AppView extends StatelessWidget {
         useMaterial3: true,
 
       ),
-      home: ResponsiveWeatherScreen(),
+      home: WeatherScreen(),
     );
   }
 }
