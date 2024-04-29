@@ -1,1 +1,2 @@
-const String apiKey='66fa9da16c30c2c0b5e16bd19e34ae28';
+const String weatherKey='';
+const String chatKey='';
