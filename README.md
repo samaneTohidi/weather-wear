@@ -1,17 +1,13 @@
-# weather_wear
+# Weather Wear
 
-A new Flutter project.
+Weather Wear is an innovative Flutter application developed to streamline your daily wardrobe decisions based on real-time weather conditions. By integrating the latest technologies, this app offers personalized clothing recommendations ensuring you're perfectly attired for the weather outside.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+### Key Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Real-time Weather Data**: Leverages weather APIs to provide up-to-date weather information.
+- **Location-based Suggestions**: Uses GPS to detect your current location and aligns clothing recommendations accordingly.
+- **Interactive Recommendations**: Incorporates GPT-based chat functionalities to deliver interactive and tailored clothing advice.
+- **Enhanced User Interface**: Focuses on user interface styling to create an engaging and easy-to-navigate app environment.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# weather-wear
